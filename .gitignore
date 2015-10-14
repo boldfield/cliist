@@ -52,3 +52,6 @@ docs/_build/
 
 settings.py
 *.elc
+
+# vim
+*.swp

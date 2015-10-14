@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from dateutil import parser as dt_parser
 import json
 import os.path
 
@@ -15,12 +16,7 @@ class Task(dict):
         self.due_date = None
         if task_raw.get('due_date'):
             due_date = task_raw['due_date']
-            if '+' in due_date:
-                self.due_date = datetime.strptime(due_date,
-                                                  '%a %d %b %Y %H:%M:%S %z')
-            else:
-                self.due_date = datetime.strptime(due_date,
-                                                  '%a %d %b %Y %H:%M:%S')
+            self.due_date = dt_parser.parse(due_date)
         self.sort_date = (self.due_date or datetime(1500, 1, 1)).replace(tzinfo=None)
         
         self.project = task_raw.get('project_id')
