@@ -1,12 +1,13 @@
 import datetime
+import sys
 
-from settings import colors
+from cliist.lib.config import Config
 
 class Plain:
     COLORS = {
-        'project': colors.PROJECT,
-        'unknown': colors.ENDC,
-        'set': colors.ENDC
+        'project': Config.color('project'),
+        'unknown': Config.color('endc'),
+        'set': Config.color('endc')
     }
     FORMAT = {
         'task': '{c0}{indent}{c5}{priority:>3.3} {c1}{content}{c0}\n        {c3}{project_name:26.26}{c4} {label_names:26.26} {c2}Due: {due:12.12}\n{c0}',
@@ -23,34 +24,33 @@ class Plain:
         due = obj.get_date()
         if due:
             due += ' '
-        print(Plain.FORMAT['task'].format(c0=colors.ENDC,
-                                          c1=colors.CONTENT,
-                                          c2=colors.DATE,
-                                          c3=colors.PROJECT,
-                                          c4=colors.LABEL,
-                                          c5=colors.PRIORITY,
-					  indent=indent,
-                                          priority=priority,
-                                          content=obj.get('content'),
-                                          project_name=obj.get('project_name'),
-                                          label_names=obj.get('label_names'),
-                                          due=due,
-                                          taskid=obj.get('id')), end='')
+        sys.stdout.write(Plain.FORMAT['task'].format(c0=Config.color('endc'),
+                                                     c1=Config.color('content'),
+                                                     c2=Config.color('date'),
+                                                     c3=Config.color('project'),
+                                                     c4=Config.color('label'),
+                                                     c5=Config.color('priority'),
+					             indent=indent,
+                                                     priority=priority,
+                                                     content=obj.get('content'),
+                                                     project_name=obj.get('project_name'),
+                                                     label_names=obj.get('label_names'),
+                                                     due=due,
+                                                     taskid=obj.get('id')))
 
     @staticmethod
     def task_set(obj):
         color = Plain.COLORS[obj.set_type]
-        print(Plain.FORMAT[obj.set_type].format(color=color,
-                                                **obj.raw), end='')
+        sys.stdout.write(Plain.FORMAT[obj.set_type].format(color=color, **obj.raw))
         for task in obj:
             Plain.task(task)
 
     @staticmethod
     def result_set(obj):
         if obj.name:
-            print('{}{}\n{}{}'.format(colors.FILTER, obj.name,
+            print('{}{}\n{}{}'.format(Config.color('filter'), obj.name,
                                       ''.join('=' for _ in obj.name or ''),
-                                      colors.ENDC))
+                                      Config.color('endc')))
         for task_set in obj.task_sets:
             Plain.task_set(task_set)
         if obj.tasks:

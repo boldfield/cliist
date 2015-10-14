@@ -15,16 +15,17 @@ The client is currently tested only with Todoist Premium.
 Every listed resultset is cached to the OS. This is helpful when you want to mark tasks completed. 
 
 ## After installation
-Run installation script and type in your API token:
-`cliist-install`
+Install via pip:
+```bash
+pip install -e git+git@github.com:boldfield/cliist.git#egg=master
+```
 
-## Updating
-Please check if there are any new settings in `settings.py.template` and add them to your local settings. I will try to figure out a better way of updating the application in the future.
+Once installed you can configure cliist: `cliist --configure`
 
 ## Examples
 
 ### List all tasks for today and that are overdue
-Input: `./cliist.py`
+Input: `cliist`
 
 Output:
 
@@ -36,7 +37,7 @@ Overdue and today
 ```
 
 ### List the tasks with a search string
-Input: `./cliist.py that`
+Input: `cliist that`
 
 Output:
 
@@ -47,7 +48,7 @@ Overdue and today
 ```
 
 ### List all projects
-Input: `./cliist.py -P`
+Input: `cliist -P`
 
 Output:
 
@@ -63,12 +64,12 @@ Output:
 ```
 
 ### Add a task for project Proj 1 with due date today and label @happy and of first priority
-Input: `./cliist.py -a a very important task @happy #Proj1 %%4` (cliist uses %%4 instead of !!4 because ! is a special character in bash).
+Input: `cliist -a a very important task @happy #Proj1 %%4` (cliist uses %%4 instead of !!4 because ! is a special character in bash).
 
-Alternetively, you could also input: `./cliist.py -a 'a very important task @happy' --project Proj1 --priority 4`
+Alternetively, you could also input: `cliist -a 'a very important task @happy' --project Proj1 --priority 4`
 
 ### Query 
-Input: `./cliist.py -q @happy`
+Input: `cliist -q @happy`
 
 Output:
 
@@ -124,7 +125,7 @@ today, tomorrow
 ## All features
 cliist features can be easily listed with `cliist -h`:
 ```
-~  ○ cliist -h                                                                                                                                                                [17:48:41]
+cliist -h                                                                                                                                                                [17:48:41]
 Usage: cliist [options] task_content|search_string|task_id
 
 Simple Todoist console client. If no options and arguments specified, all
@@ -169,5 +170,5 @@ Options:
                         New task priority (available only when adding a task).  
   --format=FORMAT       Select output format (default plain). Formats: plain,
                         org
+  --configure           Configure cliist.
 ```
-

@@ -4,12 +4,8 @@ import os.path
 
 from . import output, api
 
-from settings import colors, OUTPUT_DATE_FORMAT, TIME_OFFSET
+from cliist.lib.config import Config 
 
-try:
-    from settings import CACHE_ENABLED, CACHE
-except:
-    CACHE_ENABLED, CACHE = False, ''
 
 class Task(dict):
     def __init__(self, task_raw):
@@ -47,9 +43,10 @@ class Task(dict):
 
     def get_date(self):
         if self.due_date:
-            if TIME_OFFSET:
-                return (self.due_date + timedelta(hours=TIME_OFFSET)).strftime(OUTPUT_DATE_FORMAT)
-            return self.due_date.strftime(OUTPUT_DATE_FORMAT)
+            if Config.get('time_offset'):
+                dt = self.due_date + timedelta(hours=Config.get('time_offset'))
+                return dt.strftime(Config.get('output_date_format'))
+            return self.due_date.strftime(Config.get('output_date_format'))
         return ''
 
     def get_key(self, order):
@@ -157,9 +154,9 @@ class ResultSet:
         return json.dumps(dump)
 
     def save(self):
-        if not CACHE_ENABLED:
+        if not Config.get('cache_enabled'):
             return None
-        with open(CACHE, 'w') as fd:
+        with open(Config.get('cache'), 'w') as fd:
             fd.write(self.serialize())
 
     def lookup(self, task_info):
@@ -179,11 +176,11 @@ class ResultSet:
 
     @staticmethod
     def load():
-        if not CACHE_ENABLED:
+        if not Config.get('cache_enabled'):
             return None
-        if not os.path.exists(CACHE):
+        if not os.path.exists(Config.get('cache')):
             return None
-        with open(CACHE, 'r') as fd:
+        with open(Config.get('cache'), 'r') as fd:
             return ResultSet.deserialize(fd.read())
 
     @staticmethod

@@ -1,6 +1,7 @@
 from datetime import date
 import re
-from lib import todoist, output
+from cliist.lib import todoist, output
+from cliist.lib.config import Config
 
 EU_DATE = re.compile('\d{1,2}\.\d{1,2}\.\d{2}(\d{2})?')
 ORDER_OPTIONS = {
@@ -88,7 +89,9 @@ def command(args, options):
         'search': cinfo.get('merged'),
     }
     due_date = options.date and todoist_date(options.date) or None
-    if options.query:
+    if options.configure:
+        Config.configure()
+    elif options.query:
         todoist.query(cinfo, options.query, output_engine=formater, **list_opts)
     elif options.all:
         todoist.query(cinfo, 'view all', output_engine=formater, **list_opts)

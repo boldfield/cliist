@@ -2,34 +2,42 @@
 
 from optparse import OptionParser
 
-from lib import process
-from lib.utils import CliistException
-from lib import output
+from cliist.lib import process
+from cliist.lib.utils import CliistException
+from cliist.lib import output
 
 USAGE = "usage: %prog [options] task_content|search_string|task_id"
 DESC = """Simple Todoist console client.
-If no options and arguments specified, all uncompleted tasks for today and overdue are listed.
-Note: because ! is a special bash character, you can write %% instead of !!"""
+If no options and arguments specified, all uncompleted tasks for today and overdue
+are listed.  Note: because ! is a special bash character, you can write %% instead
+of !!
+"""
 
 def main():
-    parser = OptionParser(usage=USAGE,
-                          description=DESC)
+    parser = OptionParser(usage=USAGE, description=DESC)
 
     parser.add_option('-d', '--date',
                       dest='date',
                       default=None,
-                      help='Todoist due date formatted in Todoist date format. Available when no other options specified and when adding or editing tasks. If using with --archive, date can only be a full iso formatted date. Example: 2014-12-1T10:11')
+                      help='Todoist due date formatted in Todoist date format. '\
+                           'Available when no other options specified and when '\
+                           'adding or editing tasks. If using with --archive, '\
+                           'date can only be a full iso formatted date. '\
+                           'Example: 2014-12-1T10:11')
     
     parser.add_option('-s', '--sort',
                       dest='order',
                       default=None,
-                      help='Sort todoist tasks by content (c), priority (p) or due date (d). Available every time a list of tasks is listed.')
+                      help='Sort todoist tasks by content (c), priority (p) or '\
+                           'due date (d). Available every time a list of tasks '\
+                           'is listed.')
     
     parser.add_option('-r', '--reverse',
                       dest='reverse',
                       action='store_true',
                       default=False,
-                      help='Reverse the list. Available every time tasks, projects or labels are listed.')
+                      help='Reverse the list. Available every time tasks, '\
+                           'projects or labels are listed.')
     
     parser.add_option('-e', '--edit',
                       dest='edit_id',
@@ -85,7 +93,9 @@ def main():
     parser.add_option('--archive',
                       dest='archive',
                       action='store_true',
-                      help='If -p PROJECT is specified, show only completed tasks of that project. Date (-d) will be set as from date but it has to be in ISO format.')
+                      help='If -p PROJECT is specified, show only completed tasks '\
+                           'of that project. Date (-d) will be set as from date '\
+                           'but it has to be in ISO format.')
 
     parser.add_option('--limit',
                       dest='limit',
@@ -144,6 +154,12 @@ def main():
                       help='Select output format (default plain). Formats: '
                       + ', '.join(output.formaters.keys()) + '.')
 
+    parser.add_option('--configure',
+                      dest='configure',
+                      action='store_true',
+                      default=False,
+                      help='Configure cliist.')
+
     
     
     options, args = parser.parse_args()
@@ -151,6 +167,3 @@ def main():
         process.command(args, options)
     except CliistException as msg:
         print(msg)
-    
-if __name__ == '__main__':
-    main()
