@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from dateutil import parser as dt_parser
+from dateutil import tz, parser as dt_parser
 import json
 import os.path
 
@@ -40,11 +40,12 @@ class Task(dict):
         return json.dumps(self)
 
     def get_date(self):
+        local_zone = tz.tzlocal()
         if self.due_date:
             if Config.get('time_offset'):
-                dt = self.due_date + timedelta(hours=Config.get('time_offset'))
+                dt = self.due_date.astimezone(local_zone) + timedelta(hours=Config.get('time_offset'))
                 return dt.strftime(Config.get('output_date_format'))
-            return self.due_date.strftime(Config.get('output_date_format'))
+            return self.due_date.astimezone(local_zone).strftime(Config.get('output_date_format'))
         return ''
 
     def get_key(self, order):
