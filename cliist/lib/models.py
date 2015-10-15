@@ -5,7 +5,7 @@ import os.path
 
 from . import output, api
 
-from cliist.lib.config import Config 
+from cliist.lib.config import Config
 
 
 class Task(dict):
@@ -15,15 +15,17 @@ class Task(dict):
 
         self.due_date = None
         if task_raw.get('due_date'):
-            due_date = task_raw['due_date']
-            self.due_date = dt_parser.parse(due_date)
-        self.sort_date = (self.due_date or datetime(1500, 1, 1)).replace(tzinfo=None)
-        
+            dd = task_raw['due_date']
+            self.due_date = dt_parser.parse(dd)
+        sd = self.due_date or datetime(1500, 1, 1)
+        self.sort_date = sd.replace(tzinfo=None)
+
         self.project = task_raw.get('project_id')
         self.priority = int(task_raw.get('priority', '1'))
         self.labels = task_raw.get('labels', [])
         self['project_name'] = projects_dict.get(self.project, '')
-        self['label_names']  = ' '.join(map( lambda x: labels_dict.get(x), self.labels ))
+        lbls = ' '.join(map(lambda x: labels_dict.get(x), self.labels))
+        self['label_names'] = lbls
         self.content = task_raw.get('content', '')
         self.raw = task_raw
         self.date_string = task_raw.get('date_string', '')
@@ -53,22 +55,23 @@ class Task(dict):
 
     def __hash__(self):
         return self.get('id')
-        
+
     def pprint(self, output_engine=output.Plain):
         output_engine.task(self)
-        
+
 
 class TaskSet(list):
     FILTERS = {
-        'gte': lambda val: (lambda item: item.sort_date.date() >= val),
-        'lte': lambda val: (lambda item: item.sort_date.date() <= val),
-        'gt': lambda val: (lambda item: item.sort_date.date() > val),
-        'lt': lambda val: (lambda item: item.sort_date.date() < val),
-        'eq': lambda val: (lambda item: item.sort_date.date() == val),
-        'neq': lambda val: (lambda item: item.sort_date.date() != val),
-        'search': lambda val: (lambda item: val.lower() in item['content'].lower()),
+        'gte': lambda v: (lambda i: i.sort_date.date() >= v),
+        'lte': lambda v: (lambda i: i.sort_date.date() <= v),
+        'gt': lambda v: (lambda i: i.sort_date.date() > v),
+        'lt': lambda v: (lambda i: i.sort_date.date() < v),
+        'eq': lambda v: (lambda i: i.sort_date.date() == v),
+        'neq': lambda v: (lambda i: i.sort_date.date() != v),
+        'search': lambda v: (lambda i: v.lower() in i['content'].lower()),
     }
-    def __init__(self, result = {}, set_type='unknown'):
+
+    def __init__(self, result={}, set_type='unknown'):
         if 'project_id' in result:
             self.set_type = 'project'
         else:
@@ -96,13 +99,13 @@ class TaskSet(list):
             filtered = filter(TaskSet.FILTERS[filtername](filterval), filtered)
         if order:
             filtered = sorted(filtered, key=lambda task: task.get_key(order))
-        filtered=list(filtered)
+        filtered = list(filtered)
         selected = TaskSet(set_type=self.set_type)
         selected.raw = self.raw
         for item in (reverse and filtered[::-1] or filtered):
             selected.append(item)
         return selected
-        
+
     def pprint(self, output_engine=output.Plain):
         output_engine.task_set(self)
 
@@ -116,8 +119,8 @@ class TaskSet(list):
             elif task_info.lower() in task.get('content').lower():
                 results.add(task)
         return results
-        
-        
+
+
 class ResultSet:
     def __init__(self, result, name=None, no_save=False, **options):
         self.task_sets = []
@@ -146,7 +149,7 @@ class ResultSet:
         return ResultSet(self.raw, name=self.name, **options)
 
     def serialize(self):
-        dump = { 'name': self.name, 'raw': self.raw, }
+        dump = {'name': self.name, 'raw': self.raw}
         return json.dumps(dump)
 
     def save(self):
@@ -192,6 +195,7 @@ class LabelDict(dict):
         for name, details in api.api_call('getLabels').items():
             self[details['id']] = '@' + details['name']
 
+
 class ProjectDict(dict):
 
     def __init__(self):
@@ -200,7 +204,3 @@ class ProjectDict(dict):
 
 projects_dict = ProjectDict()
 labels_dict = LabelDict()
-
-
-
-

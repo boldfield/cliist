@@ -35,7 +35,7 @@ class Config(object):
 
         val = conf[key]
         if getattr(Config, '_{}'.format(key), None):
-            return  getattr(Config, '_{}'.format(key))(val)
+            return getattr(Config, '_{}'.format(key))(val)
         return val
 
     @classmethod
@@ -49,10 +49,18 @@ class Config(object):
         except ConfigurationError:
             curr = DEFAULT_CONFIG
 
-        curr['api_token'] = cls._config_prompt('API Token', curr, 'api_token')
-        curr['output_date_format'] = cls._config_prompt('Output Date Format', curr, 'output_date_format')
-        curr['time_offset'] = int(cls._config_prompt('Time Offset', curr, 'time_offset'))
-        curr['cache_enabled'] = cls._config_prompt('Enable Cache (y/[n])', curr, 'cache_enabled').lower()[0]
+        curr['api_token'] = cls._config_prompt('API Token',
+                                               curr,
+                                               'api_token')
+        curr['output_date_format'] = cls._config_prompt('Output Date Format',
+                                                        curr,
+                                                        'output_date_format')
+        curr['time_offset'] = int(cls._config_prompt('Time Offset',
+                                                     curr,
+                                                     'time_offset'))
+        curr['cache_enabled'] = cls._config_prompt('Enable Cache (y/[n])',
+                                                   curr,
+                                                   'cache_enabled').lower()[0]
         if curr['cache_enabled'] == 'y':
             curr['cache'] = cls._config_prompt('Cache File', curr, 'cache')
         elif 'cache' in curr:
@@ -82,7 +90,8 @@ class Config(object):
         if cls._config is None:
             cfg_path = os.path.expanduser('~/.cliist.toml')
             if not os.path.isfile(cfg_path):
-                raise ConfigurationError("Configuration not found! Please run 'cliist configure'!")
+                msg = "Configuration not found! Please run 'cliist configure'!"
+                raise ConfigurationError(msg)
             with open(cfg_path) as fs:
                 cls._config = pytoml.load(fs)
         return cls._config

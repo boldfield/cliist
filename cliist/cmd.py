@@ -8,10 +8,11 @@ from cliist.lib import output
 
 USAGE = "usage: %prog [options] task_content|search_string|task_id"
 DESC = """Simple Todoist console client.
-If no options and arguments specified, all uncompleted tasks for today and overdue
-are listed.  Note: because ! is a special bash character, you can write %% instead
-of !!
+If no options and arguments specified, all uncompleted tasks for today and \
+overdue are listed.  Note: because ! is a special bash character, you can \
+write %% instead of !!
 """
+
 
 def main():
     parser = OptionParser(usage=USAGE, description=DESC)
@@ -19,41 +20,44 @@ def main():
     parser.add_option('-d', '--date',
                       dest='date',
                       default=None,
-                      help='Todoist due date formatted in Todoist date format. '\
-                           'Available when no other options specified and when '\
-                           'adding or editing tasks. If using with --archive, '\
-                           'date can only be a full iso formatted date. '\
-                           'Example: 2014-12-1T10:11')
-    
+                      help='Todoist due date formatted in Todoist date '
+                           'format. Available when no other options specified '
+                           'and when adding or editing tasks. If using with '
+                           '--archive, date can only be a full iso formatted '
+                           'date. Example: 2014-12-1T10:11')
+
     parser.add_option('-s', '--sort',
                       dest='order',
                       default=None,
-                      help='Sort todoist tasks by content (c), priority (p) or '\
-                           'due date (d). Available every time a list of tasks '\
-                           'is listed.')
-    
+                      help='Sort todoist tasks by content (c), priority (p) '
+                           'or due date (d). Available every time a list of '
+                           'tasks is listed.')
+
     parser.add_option('-r', '--reverse',
                       dest='reverse',
                       action='store_true',
                       default=False,
-                      help='Reverse the list. Available every time tasks, '\
+                      help='Reverse the list. Available every time tasks, '
                            'projects or labels are listed.')
-    
+
     parser.add_option('-e', '--edit',
                       dest='edit_id',
                       default=None,
-                      help='Edit specified task content. Specify content with arguments.')
+                      help='Edit specified task content. Specify content with '
+                           'arguments.')
 
     parser.add_option('-q', '--query',
                       dest='query',
                       default=None,
-                      help='Query tasks using Todoist search queries as arguments.')
+                      help='Query tasks using Todoist search queries as '
+                           'arguments.')
 
     parser.add_option('-c', '--complete',
                       dest='complete',
                       action='store_true',
                       default=None,
-                      help='Mark tasks completed (arguments are task ids or search queries).')
+                      help='Mark tasks completed (arguments are task ids or '
+                           'search queries).')
 
     parser.add_option('-a', '--add',
                       dest='add_task',
@@ -83,7 +87,7 @@ def main():
                       dest='project_name',
                       default=False,
                       help='List Todoist project tasks.')
-    
+
     parser.add_option('-A', '--all',
                       dest='all',
                       action='store_true',
@@ -93,24 +97,26 @@ def main():
     parser.add_option('--archive',
                       dest='archive',
                       action='store_true',
-                      help='If -p PROJECT is specified, show only completed tasks '\
-                           'of that project. Date (-d) will be set as from date '\
-                           'but it has to be in ISO format.')
+                      help='If -p PROJECT is specified, show only completed '
+                           'tasks of that project. Date (-d) will be set as '
+                           'from date but it has to be in ISO format.')
 
     parser.add_option('--limit',
                       dest='limit',
                       default=30,
                       help='Limit returned archive size.')
-    
+
     parser.add_option('--gte',
                       dest='gte_date',
                       default=None,
-                      help='List tasks with due date greater or equal than GTE_DATE.')
+                      help='List tasks with due date greater or equal than '
+                           'GTE_DATE.')
 
     parser.add_option('--lte',
                       dest='lte_date',
                       default=None,
-                      help='List tasks with due date less or equal to LTE_DATE.')
+                      help='List tasks with due date less or equal to '
+                           'LTE_DATE.')
 
     parser.add_option('--gt',
                       dest='gt_date',
@@ -141,18 +147,21 @@ def main():
     parser.add_option('-o', '--project',
                       dest='task_project',
                       default=None,
-                      help='New task project (available only when adding a task).')
+                      help='New task project (available only when adding a '
+                           'task).')
 
     parser.add_option('-i', '--priority',
                       dest='task_priority',
                       default=False,
-                      help='New task priority (available only when adding a task).')
+                      help='New task priority (available only when adding a '
+                           'task).')
 
+    fmts = ', '.join(output.formaters.keys())
     parser.add_option('--format',
                       dest='format',
                       default='plain',
                       help='Select output format (default plain). Formats: '
-                      + ', '.join(output.formaters.keys()) + '.')
+                           '{}.'.format(fmts))
 
     parser.add_option('--configure',
                       dest='configure',
@@ -160,8 +169,6 @@ def main():
                       default=False,
                       help='Configure cliist.')
 
-    
-    
     options, args = parser.parse_args()
     try:
         process.command(args, options)

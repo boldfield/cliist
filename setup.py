@@ -16,6 +16,7 @@ except ImportError:
     use_setuptools()
     from setuptools import setup, find_packages
 
+
 # Utility function to read the contents of short files.
 def read(fname):
     with open(os.path.join(os.path.dirname(__file__), fname)) as f:
@@ -32,6 +33,8 @@ tests_require = [
     'mock==1.0.0',
     'coverage==3.5.2',
 ]
+
+download_url = 'https://github.com/boldfield/cliist/tarball/{}'.format(VERSION)
 
 setup(
     name="cliist",
@@ -52,7 +55,7 @@ setup(
     license="Apache Software License, v2",
     keywords=("todoist task management"),
     url="https://github.com/boldfield/cliist",
-    download_url='https://github.com/boldfield/cliist/tarball/{}'.format(VERSION),
+    download_url=download_url,
 
     package_data={'dvm': ['VERSION']},
 

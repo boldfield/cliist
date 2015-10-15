@@ -14,6 +14,7 @@ from cliist.lib.config import Config
 
 API_URL = 'https://api.todoist.com/API'
 
+
 def api_call(method, **options):
     options['token'] = Config.get('api_token')
     query_string = parse.urlencode(options)
@@ -27,4 +28,3 @@ def api_call(method, **options):
 
     except Exception as ex:
         print(ex)
-

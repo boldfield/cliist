@@ -8,6 +8,7 @@ from .api import api_call
 QUERY_DELIMITER = re.compile(', *')
 TASK_FORMAT = '{c0}{indent} - {taskid:10} {priority}{c1}{content} {c2}{due}'
 
+
 def ulist(l):
     return json.dumps(l).replace(', ', ',')
 
@@ -15,8 +16,9 @@ def ulist(l):
 def prepare_task_info(cinfo, due_date=None):
     labels, project = [], None
     if cinfo.get('labels'):
-        all_labels = list_labels(cinfo, stdout=False,
-                             do_search=False)
+        all_labels = list_labels(cinfo,
+                                 stdout=False,
+                                 do_search=False)
         for label in cinfo['labels']:
             if label not in all_labels:
                 continue
@@ -42,6 +44,7 @@ def prepare_task_info(cinfo, due_date=None):
         args['date_string'] = due_date
     return labels, project, args
 
+
 def get_taks(cinfo, task=None):
     cached = models.ResultSet.load()
     ids_recurring, ids_normal = [], []
@@ -53,15 +56,19 @@ def get_taks(cinfo, task=None):
                 if task is not None and task.is_recurring:
                     ids_recurring.append(task_id)
                     continue
-                
+
             ids_normal.append(task_id)
         elif cached is not None:
             result = cached.lookup(task_raw)
             if len(result) > 1:
-                raise CliistException('Too many cached results for {}.\nNo tasks were marked completed'.format(task_raw))
+                msg = 'Too many cached results for {}.\n'\
+                      'No tasks were marked completed'.format(task_raw)
+                raise CliistException(msg)
 
             elif len(result) < 1:
-                raise CliistException('No cached results for "{}".\nNo tasks were marked completed'.format(task_raw))
+                msg = 'No cached results for "{}".\n'\
+                      'No tasks were marked completed'.format(task_raw)
+                raise CliistException()
             else:
                 task = result[0]
                 task_id = task.get('id')
@@ -70,7 +77,9 @@ def get_taks(cinfo, task=None):
                 else:
                     ids_normal.append(task_id)
         else:
-            raise CliistException('No chached results. Please list your tasks with cliist to enable task lookup.\nNo tasks were marked completed')
+            msg = 'No chached results. Please list your tasks with cliist '\
+                  'to enable task lookup.\nNo tasks were marked completed'
+            raise CliistException(msg)
     return ids_normal + ids_normal, ids_normal, ids_recurring
 
 
@@ -79,6 +88,7 @@ def list_cache(output_engine=output.Plain):
     if cached is None:
         raise CliistException('Cache is empty')
     cached.pprint(output_engine=output_engine)
+
 
 def project_tasks(cinfo, project_name, stdout=True,
                   output_engine=output.Plain, **options):
@@ -92,12 +102,15 @@ def project_tasks(cinfo, project_name, stdout=True,
     if not project_id:
         return
     result = api_call('getUncompletedItems', project_id=project_id)
-    result_set = models.ResultSet(result, project_name or 'view all', **options)
+    result_set = models.ResultSet(result,
+                                  project_name or 'view all',
+                                  **options)
     if stdout:
         result_set.pprint(output_engine=output_engine)
     return result_set
 
-def archive(cinfo, limit, date=None, project_name=None, stdout=True, 
+
+def archive(cinfo, limit, date=None, project_name=None, stdout=True,
             output_engine=output.Plain, **options):
     result = None
     all_projects = list_projects(cinfo, stdout=False, do_search=False)
@@ -115,7 +128,8 @@ def archive(cinfo, limit, date=None, project_name=None, stdout=True,
     if stdout:
         result_set.pprint(output_engine=output_engine)
     return result_set
-    
+
+
 def query(info, query, stdout=True, output_engine=output.Plain, **options):
     queries = QUERY_DELIMITER.split(query)
     result = api_call('query', queries=ulist(queries))
@@ -124,6 +138,7 @@ def query(info, query, stdout=True, output_engine=output.Plain, **options):
         result_set.pprint(output_engine=output_engine)
     return result_set
 
+
 def complete_tasks(cinfo):
     ids, ids_normal, ids_recurring = get_taks(cinfo)
 
@@ -131,6 +146,7 @@ def complete_tasks(cinfo):
         api_call('completeItems', ids=ids_normal)
     if ids_recurring:
         api_call('updateRecurringDate', ids=ids_recurring)
+
 
 def add_task(cinfo, due_date=None):
     if not cinfo:
@@ -142,6 +158,7 @@ def add_task(cinfo, due_date=None):
         api_args['priority'] = 1
     api_call('addItem', **api_args)
 
+
 def edit_task(cinfo, edit_id, due_date=None):
     if not cinfo:
         raise CliistException('No task content')
@@ -149,7 +166,7 @@ def edit_task(cinfo, edit_id, due_date=None):
     labels, project, api_args = prepare_task_info(cinfo, due_date)
     api_args['id'] = edit_id
     api_call('updateItem', **api_args)
-    
+
 
 def list_labels(cinfo, stdout=True, info=False,
                 do_search=True, reverse=False):
@@ -165,7 +182,8 @@ def list_labels(cinfo, stdout=True, info=False,
                 out_str += ' ' + str(label['id'])
             print(out_str)
     return result
-    
+
+
 def list_projects(cinfo, stdout=True, do_search=True, reverse=False):
     result = api_call('getProjects')
     search = do_search and cinfo.get('merged')
@@ -178,11 +196,15 @@ def list_projects(cinfo, stdout=True, do_search=True, reverse=False):
             print(indent + '#' + name)
     return result
 
-def list_tasks(cinfo, due_date, stdout=True, output_engine=output.Plain, **options):
-    result = api_call('query', queries=ulist(['overdue','today','tomorrow']))
+
+def list_tasks(cinfo, due_date,
+               stdout=True, output_engine=output.Plain, **options):
+    result = api_call('query', queries=ulist(['overdue', 'today', 'tomorrow']))
     if cinfo:
         options['search'] = cinfo.get('merged')
-    result_set = models.ResultSet(result, name='Overdue, today and tomorrow', **options)
+    result_set = models.ResultSet(result,
+                                  name='Overdue, today and tomorrow',
+                                  **options)
     if stdout:
         result_set.pprint(output_engine=output_engine)
     return result_set

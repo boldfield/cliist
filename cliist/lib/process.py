@@ -10,11 +10,14 @@ ORDER_OPTIONS = {
     'd': 'sort_date',
 }
 
+
 def is_word_label(word):
     return word and word[0] == '@'
 
+
 def is_word_project(word):
     return word and word[0] == '#'
+
 
 def is_word_priority(word):
     return len(word) > 2 and word[:2] == '!!' and word[2:].isdigit()
@@ -27,18 +30,19 @@ def str_date(date_str):
     if '.' in date_str:
         d, m, y = date_str.split('.')
     return date(int(y), int(m), int(d))
-    
+
+
 def todoist_date(date_str):
     if EU_DATE.match(date_str):
         return date_str.replace('.', '/')
     return date_str
-    
+
+
 def content_info(content_raw, options):
     content = []
-    mapper = lambda w: w.replace('%%', '!!').split(' ')
-    for words in map(mapper, content_raw):
-        content.extend(words)   
-    
+    for words in map(lambda w: w.replace('%%', '!!').split(' '), content_raw):
+        content.extend(words)
+
     raw_words = []
     raw_labels = []
     project = None
@@ -63,6 +67,7 @@ def content_info(content_raw, options):
         'priority': priority or options.task_priority,
     }
 
+
 def get_filters(options):
     filters = {}
     if options.gte_date:
@@ -78,7 +83,8 @@ def get_filters(options):
     if options.neq_date:
         filters['neq'] = str_date(options.neq_date)
     return filters
-    
+
+
 def command(args, options):
     cinfo = args and content_info(args, options) or {}
     formater = output.formaters[options.format]
@@ -92,11 +98,11 @@ def command(args, options):
     if options.configure:
         Config.configure()
     elif options.query:
-        todoist.query(cinfo, options.query, output_engine=formater, **list_opts)
+        todoist.query(cinfo, options.query, output_engine=formater, **list_opts)  # nopep8
     elif options.all:
         todoist.query(cinfo, 'view all', output_engine=formater, **list_opts)
     elif options.archive:
-        todoist.archive(cinfo, options.limit, options.date, options.project_name,
+        todoist.archive(cinfo, options.limit, options.date, options.project_name,  # nopep8
                         output_engine=formater, **list_opts)
     elif options.complete:
         todoist.complete_tasks(cinfo)
@@ -114,5 +120,4 @@ def command(args, options):
     elif options.cached:
         todoist.list_cache(output_engine=formater)
     else:
-        todoist.list_tasks(cinfo, due_date, output_engine=formater, **list_opts)
-        
+        todoist.list_tasks(cinfo, due_date, output_engine=formater, **list_opts)  # nopep8
