@@ -11,7 +11,7 @@ class Plain:
         'set': Config.color('endc')
     }
     FORMAT = {
-        'task': '{c0}{indent}{c5}{priority:>3.3} {c1}{content}{c0}\n        {c3}{project_name:26.26}{c4} {label_names:26.26} {c2}Due: {due:12.12}\n{c0}',  # nopep8
+        'task': '{c0}{indent}{c5}{priority:>3.3} {c1}{content}{c0}\n        {c3}{project_name:26.26}{c4} {label_names:26.26} {c2}Due: {due:21.21}\n{c0}',  # nopep8
         'project': '\n{color}#{project_name}\n',
         'unknown': '',
     }
